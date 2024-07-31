@@ -1,6 +1,5 @@
 import subprocess
 
-
 def docker_ps():
     subprocess.call(
         'docker ps --format "table {{.ID}}\t{{.Names}}\t{{.Image}}\t{{.Status}}"',
@@ -10,9 +9,9 @@ def docker_ps():
 
 def docker_stop():
     containers = (
-        subprocess.check_output('docker ps --format "table {{.ID}}"', shell=True)
+        subprocess.check_output('docker ps --format "{{.ID}}"', shell=True)
         .decode("utf-8")
-        .splitlines()[1:]
+        .splitlines()
     )
 
     if containers:
