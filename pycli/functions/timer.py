@@ -1,9 +1,8 @@
 import click
-import winsound
-import ctypes
 import time
 import pathlib
 import os
+
 
 @click.command()
 @click.argument("reason")
@@ -15,19 +14,32 @@ def timer(reason: str, seconds: int, box: bool):
     print(f"Starting timer for {seconds} seconds because {reason}")
 
     total_seconds = seconds
-        
+
     print()
-    for seconds in range(1, total_seconds+1):
+    for seconds in range(1, total_seconds + 1):
         time.sleep(1)
         terminal_width = os.get_terminal_size().columns
-        MAX_LEN = int(terminal_width * 2/3)
+        MAX_LEN = int(terminal_width * 2 / 3)
         completion = int((seconds / total_seconds) * MAX_LEN)
         completion_inverse = MAX_LEN - completion
-        progress = "[" + "#"*completion + " "*completion_inverse + "]" + f" {seconds}/{total_seconds} seconds"
-        print("\r" + progress + " "*(terminal_width-len(progress)), end="", flush=True)
+        progress = (
+            "["
+            + "#" * completion
+            + " " * completion_inverse
+            + "]"
+            + f" {seconds}/{total_seconds} seconds"
+        )
+        print(
+            "\r" + progress + " " * (terminal_width - len(progress)), end="", flush=True
+        )
 
     wav_path = pathlib.Path(__file__).parent / "timer.wav"
-    winsound.PlaySound(wav_path.as_posix(), winsound.SND_FILENAME)
+
+    # detect windows
+    if os.name == "nt":
+        import winsound
+
+        winsound.PlaySound(wav_path.as_posix(), winsound.SND_FILENAME)
 
     print("\n\nDone!")
 
@@ -44,13 +56,18 @@ def timer(reason: str, seconds: int, box: bool):
 
         window_height = 250
         window_width = 550
-        
-        geometry = "%dx%d+%d+%d" % (window_width, window_height, screen_width/2-(window_width//2), screen_height/2-(window_height//2))
+
+        geometry = "%dx%d+%d+%d" % (
+            window_width,
+            window_height,
+            screen_width / 2 - (window_width // 2),
+            screen_height / 2 - (window_height // 2),
+        )
         print(geometry)
         root.geometry(geometry)
         text_box = tk.Text(root)
         text_box.insert(tk.END, reason)
-        root.configure(background='red')
+        root.configure(background="red")
         root.lift()
 
         # TODO: cleanup
